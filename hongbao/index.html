@@ -1,0 +1,422 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Lucky Hongbao</title>
+<link rel="manifest" href="../manifest.webmanifest">
+<meta name="theme-color" content="#E3262B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Prosperity Lions">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="../icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" href="../icons/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Lilita+One&family=Ma+Shan+Zheng&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  /* Same festive system as the quiz and chat: lacquer red ground, gold, cream paper. */
+  :root{
+    --red:#E3262B; --red-deep:#A8141C; --red-ink:#6B0F14;
+    --gold:#FFC83D; --gold-deep:#E89B12; --gold-soft:#FFE7A3;
+    --paper:#FFFBF3; --cream:#FFF1DC; --line:#F1D7B3;
+    --ink:#4A1216; --muted:#8A5A4E; --jade:#2FAE84;
+    --display:"Lilita One","Baloo 2",ui-rounded,system-ui,sans-serif;
+    --ui:"Baloo 2",ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif;
+    --brush:"Ma Shan Zheng","STKaiti","KaiTi","Kaiti SC",serif;
+    color-scheme:light;
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none!important}
+  html,body{min-height:100%}
+  body{
+    margin:0;color:var(--ink);font-family:var(--ui);font-size:16px;line-height:1.4;
+    background-color:var(--red);
+    background-image:
+      radial-gradient(ellipse at 50% -10%,rgba(255,170,90,.45),rgba(255,170,90,0) 60%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23FFD36A' stroke-opacity='.22' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M16 46c0-9 11-13 17-6 2-11 18-11 20 0 9-4 17 5 11 12H22c-4 0-6-3-6-6z'/%3E%3Cpath d='M30 40c3-3 8-3 10 1'/%3E%3Ccircle cx='100' cy='104' r='11'/%3E%3Crect x='95' y='99' width='10' height='10'/%3E%3Cpath d='M92 30l4 6-4 6-4-6z'/%3E%3Cpath d='M30 110c6-8 14-8 20 0'/%3E%3C/g%3E%3C/svg%3E");
+    -webkit-tap-highlight-color:transparent;
+  }
+  button,a{font:inherit;color:inherit}
+  button{cursor:pointer;touch-action:manipulation}
+  :focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+  .decor{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .decor svg{position:absolute;animation:bob 6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(var(--r,0deg))}50%{transform:translateY(-12px) rotate(calc(var(--r,0deg) + 8deg))}}
+
+  .wrap{position:relative;z-index:1;max-width:480px;margin:0 auto;padding-block:14px 0;padding-inline:16px;display:flex;flex-direction:column;gap:14px;min-height:100vh}
+  .brandbar{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--gold-soft)}
+  .brand{display:flex;align-items:center;gap:8px;font-family:var(--display);font-size:18px;letter-spacing:.02em}
+  .fu{width:34px;height:34px;display:grid;place-items:center;background:var(--gold);color:var(--red);font-family:var(--brush);font-size:24px;line-height:1;transform:rotate(45deg);border-radius:5px;box-shadow:0 3px 0 var(--red-deep)}
+  .fu span{transform:rotate(-45deg) translateY(1px)}
+  .brandbar .tag{font-size:13px;font-weight:700;opacity:.9}
+
+  .card{background:var(--paper);border:3px solid var(--gold);border-radius:30px;box-shadow:0 7px 0 var(--red-deep),0 24px 40px -14px rgba(60,0,0,.55);overflow:hidden;position:relative}
+  .screen{animation:enter .4s cubic-bezier(.2,1.25,.4,1)}
+  @keyframes enter{from{transform:translateY(14px) scale(.985);opacity:.35}}
+  h1,h2,h3{font-family:var(--display);font-weight:400;margin:0;text-wrap:balance;letter-spacing:.01em;line-height:1.05}
+  .eyebrow{margin:0;font-size:12.5px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--red)}
+  .zh{font-family:var(--brush);font-weight:400}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:3px solid #FFD66B;border-radius:999px;padding:13px 28px 10px;background:linear-gradient(180deg,#FF5A4E,#E3262B 60%,#CC1D22);color:#fff;font-family:var(--display);font-size:22px;letter-spacing:.03em;text-decoration:none;box-shadow:0 5px 0 var(--red-deep),0 12px 20px -8px rgba(168,20,28,.6);transition:transform .08s,box-shadow .08s}
+  .btn:hover{filter:brightness(1.06)}
+  .btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--red-deep)}
+  .btn .zh{font-size:22px;color:var(--gold-soft)}
+  .btn.gold{background:linear-gradient(180deg,#FFE9A0,#FFC83D 55%,#F0A91E);color:var(--red-ink);border-color:#fff3c8;box-shadow:0 5px 0 #C27A0C,0 12px 20px -8px rgba(194,122,12,.6)}
+  .btn.gold .zh{color:var(--red)}
+  .btn.gold:active{box-shadow:0 1px 0 #C27A0C}
+  .btn.soft{background:var(--cream);color:var(--red);border-color:var(--line);box-shadow:0 5px 0 var(--line);font-size:19px}
+  .btn.soft:active{box-shadow:0 1px 0 var(--line)}
+  .pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 12px 3px;background:var(--cream);border:2px solid var(--line);font-weight:700;font-size:14px;color:var(--red-ink)}
+  .pill b{color:var(--red)}
+  .small{font-size:13.5px;color:var(--muted)}
+  .note{margin:0;font-size:12.5px;color:var(--muted);text-align:center}
+  .chip{border:2px dashed var(--gold-deep);background:#FFF7DC;color:var(--red-ink);border-radius:999px;padding:6px 13px 4px;font-weight:800;font-size:14px;line-height:1.2}
+  .chip:hover{background:var(--gold-soft);border-style:solid}
+  .chip[aria-pressed="true"]{background:var(--gold);border-style:solid}
+
+  /* hero with lion */
+  .rhero{position:relative;background:#FFE1D6;padding:16px 16px 14px;text-align:center;overflow:hidden}
+  .rays{position:absolute;left:50%;top:95px;width:520px;height:520px;margin:-260px 0 0 -260px;border-radius:50%;background:repeating-conic-gradient(#FFC2AE 0 10deg,transparent 10deg 20deg);opacity:.55;animation:rot 30s linear infinite}
+  @keyframes rot{to{transform:rotate(360deg)}}
+  .hero-row{position:relative;display:flex;align-items:flex-end;gap:10px;text-align:left}
+  .hero-row .lion{flex:none;width:128px;height:128px;image-rendering:pixelated;image-rendering:crisp-edges;animation:hop 2.4s ease-in-out infinite}
+  @keyframes hop{0%,100%{transform:translateY(0)}40%{transform:translateY(-10px) rotate(-3deg)}60%{transform:translateY(-3px) rotate(2deg)}}
+  .say{position:relative;flex:1;background:#fff;border:2px solid var(--line);border-radius:20px 20px 20px 6px;padding:10px 14px 9px;margin-bottom:18px}
+  .say .who{font-size:12px;font-weight:800;letter-spacing:.06em;color:#9E1414}
+  .say .who .zh{font-size:17px;margin-right:4px;color:var(--red)}
+  .say p{margin:1px 0 0;font-weight:600;font-size:16px;line-height:1.4}
+  .context{position:relative;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:2px}
+
+  /* sealed envelope */
+  .seal-body{padding:22px 20px 26px;display:flex;flex-direction:column;align-items:center;gap:16px;text-align:center}
+  .seal-body h2{font-size:30px;color:var(--red)}
+  .env{position:relative;width:190px;height:252px;border:0;background:none;padding:0;margin:4px 0 6px;perspective:900px;animation:wobble 2.4s ease-in-out infinite;filter:drop-shadow(0 8px 0 rgba(107,15,20,.18))}
+  .env:hover{animation-duration:1.2s}
+  @keyframes wobble{0%,100%{transform:rotate(0)}8%{transform:rotate(-5deg)}16%{transform:rotate(4deg)}24%{transform:rotate(-2deg)}32%{transform:rotate(0)}}
+  .env.open{animation:none}
+  .env span{position:absolute;display:block}
+  .env-back{inset:0;border-radius:18px;background:linear-gradient(#C81E24,#A8141C);z-index:1}
+  .env-card{left:16px;right:16px;top:14px;height:196px;border-radius:12px;background:var(--paper);border:3px solid var(--gold);z-index:2;display:grid!important;place-items:center;transition:transform .8s .35s cubic-bezier(.2,1.3,.4,1)}
+  .env-card .zh{position:static;font-size:64px;color:var(--gold-deep);line-height:1}
+  .env.open .env-card{transform:translateY(-138px)}
+  .env-front{inset:0;border-radius:18px;z-index:3;background:
+      repeating-linear-gradient(45deg,rgba(255,211,106,.14) 0 6px,transparent 6px 14px),
+      linear-gradient(180deg,#FF5A4E,#E3262B 55%,#CC1D22);
+    clip-path:polygon(0 28%,50% 47%,100% 28%,100% 100%,0 100%)}
+  .env-trim{left:18px;right:18px;bottom:18px;height:0;border-top:3px dashed var(--gold);z-index:4}
+  .env-flap{left:0;right:0;top:0;height:50%;z-index:5;border-radius:18px 18px 0 0;background:linear-gradient(180deg,#E3262B,#C81E24);clip-path:polygon(0 0,100% 0,100% 56%,50% 95%,0 56%);transform-origin:50% 0;transition:transform .55s ease-in}
+  .env.open .env-flap{transform:rotateX(180deg);z-index:1}
+  .env-seal{left:50%;top:35%;width:70px;height:70px;margin-left:-35px;border-radius:50%;z-index:6;background:radial-gradient(circle at 40% 35%,#FFF0B8,#FFC83D 55%,#E89B12);border:3px solid #fff3c8;box-shadow:0 3px 0 #C27A0C;display:grid!important;place-items:center;transition:transform .35s,opacity .3s}
+  .env-seal .zh{position:static;font-size:42px;color:#C81E24;line-height:1;transform:translateY(2px)}
+  .env.open .env-seal{transform:scale(.2) rotate(120deg);opacity:0}
+  .tap{font-family:var(--display);font-size:20px;color:var(--red-ink);display:flex;align-items:center;gap:8px}
+  .tap .zh{font-size:24px;color:var(--red)}
+
+  /* result */
+  .res-body{padding:18px 18px 22px;display:flex;flex-direction:column;gap:16px}
+  .res-head{text-align:center;display:flex;flex-direction:column;gap:4px;align-items:center}
+  .res-head h2{font-size:32px;color:var(--red)}
+  .ticket{position:relative;border-radius:22px;border:3px solid var(--gold);background:#fff;box-shadow:0 5px 0 var(--line);overflow:hidden}
+  .t-top{position:relative;padding:16px 18px 18px;color:#fff;background:
+      repeating-linear-gradient(45deg,rgba(255,211,106,.12) 0 6px,transparent 6px 14px),
+      linear-gradient(180deg,#FF5A4E,#E3262B 60%,#CC1D22)}
+  .t-top.gift{background:repeating-linear-gradient(45deg,rgba(255,255,255,.14) 0 6px,transparent 6px 14px),linear-gradient(180deg,#44C79A,#2FAE84 60%,#1F8A66)}
+  .t-kind{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--gold-soft)}
+  .t-top h3{font-size:30px;margin-top:4px;color:#fff;max-width:14ch}
+  .t-venue{margin:6px 0 0;font-weight:700;font-size:15px}
+  .t-venue small{display:inline-block;margin-left:6px;padding:1px 8px 0;border-radius:999px;background:rgba(255,255,255,.2);font-size:12px;font-weight:800}
+  .stamp{position:absolute;right:14px;top:14px;transform:rotate(12deg);border:3px solid var(--gold-soft);color:var(--gold-soft);font-family:var(--display);font-size:15px;letter-spacing:.12em;padding:3px 10px 1px;border-radius:8px}
+  .perf{position:relative;height:0;border-top:3px dashed var(--line);margin:0 20px}
+  .perf::before,.perf::after{content:"";position:absolute;top:-16px;width:28px;height:28px;border-radius:50%;background:var(--paper);border:3px solid var(--gold)}
+  .perf::before{left:-38px}.perf::after{right:-38px}
+  .t-body{padding:18px;display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}
+  .qr{width:156px;height:156px;padding:8px;border-radius:14px;background:#fff;border:2px solid var(--line);display:grid;place-items:center}
+  .qr img,.qr canvas{display:block;width:136px!important;height:136px!important}
+  .qr .nofallback{font-size:12px;color:var(--muted);text-align:center}
+  .t-meta{display:flex;flex-direction:column;gap:10px;min-width:0}
+  .kv .k{display:block;font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+  .kv .v{font-weight:800;font-size:15.5px;line-height:1.25}
+  .code{font-family:var(--display);font-weight:400!important;font-size:20px!important;letter-spacing:.06em;color:var(--red);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+  .copy{align-self:flex-start;border:2px solid var(--line);background:var(--cream);color:var(--red);border-radius:999px;padding:5px 14px 3px;font-weight:800;font-size:14px;box-shadow:0 3px 0 var(--line)}
+  .copy:active{transform:translateY(2px);box-shadow:0 1px 0 var(--line)}
+  .steps{margin:0;padding:0 18px 18px;list-style:none;display:grid;gap:8px;counter-reset:s}
+  .steps li{display:grid;grid-template-columns:26px 1fr;gap:10px;align-items:start;font-weight:600;font-size:14.5px;line-height:1.35;counter-increment:s}
+  .steps li::before{content:counter(s);width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--red-ink);font-family:var(--display);display:grid;place-items:center;font-size:15px;padding-top:2px}
+  details.terms{border-top:2px solid var(--cream);padding:10px 18px 14px;font-size:13.5px;color:var(--muted)}
+  details.terms summary{cursor:pointer;font-weight:800;color:var(--red-ink)}
+  details.terms ul{margin:8px 0 0;padding-left:18px;display:grid;gap:4px}
+
+  .blessing{border-radius:22px;border:3px solid var(--gold);background:radial-gradient(circle at 50% 0,#FFF6DA,#FFF1DC 70%);box-shadow:0 5px 0 var(--line);padding:22px 18px 20px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center}
+  .blessing .big{font-family:var(--brush);font-size:56px;line-height:1.05;color:var(--red);letter-spacing:.06em}
+  .blessing .mean{font-weight:800;font-size:16px;color:var(--red-ink)}
+  .blessing .bonus{margin-top:8px}
+
+  .actions{display:flex;flex-direction:column;gap:12px}
+  .actions .btn{width:100%}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .row2 .btn{font-size:17px;padding:11px 12px 8px}
+
+  .demo{margin:0 4px;padding:12px 14px;border-radius:18px;background:rgba(107,15,20,.28);color:var(--gold-soft);display:flex;flex-direction:column;gap:8px}
+  .demo p{margin:0;font-size:13px;font-weight:700}
+  .demo .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 20px);transform:translateX(-50%);background:var(--red-ink);color:#fff;font-weight:700;padding:8px 16px 6px;border-radius:999px;z-index:20;box-shadow:0 6px 16px -6px rgba(0,0,0,.5)}
+
+  .burst{position:fixed;left:0;top:0;pointer-events:none;z-index:9}
+  .burst i{position:absolute;width:9px;height:6px;border-radius:2px;animation:pop .9s cubic-bezier(.1,.7,.3,1) forwards}
+  .burst i.coin{width:14px;height:14px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#FFF0B8,#FFC83D 55%,#E89B12)!important}
+  @keyframes pop{to{transform:translate(var(--x),var(--y)) rotate(var(--rot));opacity:0}}
+  .skyline{display:block;width:calc(100% + 32px);margin:auto -16px 0;height:auto;max-width:none}
+
+  .clip{display:block;width:100%;height:100%;object-fit:contain;background:#F7EBD0;image-rendering:pixelated;image-rendering:crisp-edges}
+  .hero-row .clipstage{flex:none;width:128px;height:128px;border-radius:24px;overflow:hidden;background:#F7EBD0;border:3px solid #9E1414;box-shadow:0 4px 0 rgba(107,15,20,.18)}
+  @media (max-width:400px){
+    .hero-row .clipstage{width:96px;height:96px}
+    .t-body{grid-template-columns:1fr;justify-items:center;text-align:center}
+    .t-meta{align-items:center}
+    .copy{align-self:center}
+    .hero-row .lion{width:96px;height:96px}
+    .row2{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="decor" id="decor" aria-hidden="true"></div>
+
+<div class="wrap">
+  <header class="brandbar">
+    <div class="brand"><span class="fu" aria-hidden="true"><span>福</span></span>Prosperity Lions</div>
+    <span class="tag">Gong Xi Fa Cai!</span>
+  </header>
+  <main class="card" id="app" aria-live="polite"></main>
+  <section class="demo" aria-label="Prototype controls">
+    <p>Prototype only: in the real app the server decides the prize. Preview each result:</p>
+    <div class="chips" id="demoChips">
+      <button class="chip" data-tier="voucher">Voucher</button>
+      <button class="chip" data-tier="gift">Gift</button>
+      <button class="chip" data-tier="blessing">Blessing only</button>
+      <button class="chip" data-tier="reset">Seal it again</button>
+    </div>
+  </section>
+  <svg class="skyline" id="skyline" viewBox="0 0 480 110" preserveAspectRatio="xMidYMax slice" aria-hidden="true"></svg>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const app = $('#app');
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CHAT_URL = '../';
+const GAME_URL = '../game/';
+
+const LIONS = {
+  HH:{ name:'Hong Hong', zh:'洪洪', m:'#E8322A', d:'#9E1414', l:'#FF8A6B', t:'#FFD24A', brow:14, food:'Soi Social', foodNote:'modern Thai' },
+  RR:{ name:'Rui Rui', zh:'瑞瑞', m:'#FFC21A', d:'#B36400', l:'#FFE68A', t:'#E8322A', brow:-8, food:'Feng Shui Inn', foodNote:'Cantonese dim sum' },
+  XX:{ name:'Xing Xing', zh:'星星', m:'#35B872', d:'#136B41', l:'#9BE8BC', t:'#FFD24A', brow:-8, food:'Moutarde by Paul Pairet', foodNote:'casual French' },
+  XI:{ name:'Xi Xi', zh:'喜喜', m:'#FF7FAA', d:'#B8305F', l:'#FFC6DA', t:'#FFD24A', brow:-8, food:'Syun', foodNote:'Japanese lunch sets' },
+  ZZ:{ name:'Zhi Zhi', zh:'智智', m:'#3F8FE0', d:'#1B4E98', l:'#A6D0FF', t:'#FFD24A', brow:-8, food:'Ocean Restaurant', foodNote:'sustainable seafood' }
+};
+const BLESSINGS = [
+  ['万事如意', 'May all go well'], ['心想事成', 'May your wishes come true'], ['大吉大利', 'Great luck and great fortune'],
+  ['步步高升', 'Rising higher step by step'], ['笑口常开', 'May you always be smiling'], ['龙马精神', 'The lively spirit of a dragon-horse']
+];
+
+/* ----- context from the link: #game3HH = came from the game with 3 stars, lion Hong Hong ----- */
+const m = location.hash.match(/^#game([0-3])(HH|RR|XX|XI|ZZ)?$/);
+const fromGame = !!m;
+const stars = m ? +m[1] : 0;
+const K = (m && m[2]) || 'HH';
+const L = LIONS[K];
+
+/* ----- lion art: the chatbot's pixel-art portraits ----- */
+const f1 = n => +n.toFixed(1);
+let heroExpr = 'happy';
+function lionSVG(k){
+  const L = LIONS[k], id = k.toLowerCase();
+  const file = heroExpr === 'celebrating' ? `img/${id}/${id}_expr_celebrating_v1.png` : heroExpr === 'sorry' ? `img/${id}/${id}_expr_sorry_v1.png` : `img/${id}/${id}_master_front_v1.png`;
+  return `<img class="lion" src="${file}" alt="${L.name}" width="128" height="128" draggable="false">`;
+}
+
+/* Hero clips (Asset Checklist video set): 720x720 pixel-art video, WebM with MP4 fallback, muted, no audio.
+   Each clip starts and ends on the master pose. */
+function clipVideo(k, name){
+  const id = k.toLowerCase(), b = `clips/${id}/${id}_clip_${name}_v1`;
+  return `<video class="clip" muted playsinline autoplay preload="auto" disablepictureinpicture disableremoteplayback poster="img/${id}/${id}_master_front_v1.png" aria-hidden="true"><source src="${b}.webm" type="video/webm"><source src="${b}.mp4" type="video/mp4"></video>`;
+}
+function armClips(root, onDone){
+  if (!root) return;
+  root.querySelectorAll('video.clip:not([data-armed])').forEach(v => {
+    v.dataset.armed = '1'; v.muted = true;
+    let done = false; const end = failed => { if (done) return; done = true; if (onDone) onDone(v, failed); };
+    v.addEventListener('ended', () => end(false));
+    const srcs = v.querySelectorAll('source');
+    if (srcs.length) srcs[srcs.length - 1].addEventListener('error', () => end(true));
+    const p = v.play(); if (p && p.catch) p.catch(() => setTimeout(() => end(true), 300));
+  });
+}
+let heroClip = null;   // 'hongbao_win' or 'blessing' while the result clip plays
+function heroLion(){ return heroClip && !reduce ? `<div class="clipstage" id="heroClip">${clipVideo(K, heroClip)}</div>` : lionSVG(K); }
+
+/* ----- background decor and skyline (same as the quiz) ----- */
+function rng(seed){ return () => (seed = (seed * 16807) % 2147483647) / 2147483647; }
+const orange = (cx, cy, r) => `<g><circle cx="${cx}" cy="${cy}" r="${r}" fill="#FF9A1F"/><circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E07400" stroke-width="${f1(r * .12)}"/><ellipse cx="${f1(cx - r * .35)}" cy="${f1(cy - r * .35)}" rx="${f1(r * .28)}" ry="${f1(r * .18)}" fill="#FFD08A" transform="rotate(-35 ${f1(cx - r * .35)} ${f1(cy - r * .35)})"/><ellipse cx="${f1(cx + r * .38)}" cy="${f1(cy - r * 1.05)}" rx="${f1(r * .45)}" ry="${f1(r * .2)}" fill="#2FAE84" transform="rotate(-20 ${f1(cx + r * .38)} ${f1(cy - r * 1.05)})"/></g>`;
+const blossom = c => { let p = ''; for (let k = 0; k < 5; k++){ const a = k / 5 * Math.PI * 2 - Math.PI / 2; p += `<circle cx="${f1(20 + Math.cos(a) * 8)}" cy="${f1(20 + Math.sin(a) * 8)}" r="7.5"/>`; } return `<svg viewBox="0 0 40 40" width="%W" height="%W"><g fill="${c}">${p}</g><circle cx="20" cy="20" r="4.5" fill="#FFC83D"/></svg>`; };
+const ingot = () => `<svg viewBox="0 0 48 32" width="%W" height="%W"><path d="M2 12 Q6 30 24 30 Q42 30 46 12 Q36 18 24 18 Q12 18 2 12Z" fill="#FFC83D" stroke="#C27A0C" stroke-width="2"/><ellipse cx="24" cy="13" rx="11" ry="7" fill="#FFE08A" stroke="#C27A0C" stroke-width="2"/></svg>`;
+const orangeIcon = () => `<svg viewBox="0 0 40 40" width="%W" height="%W">${orange(20, 23, 14)}</svg>`;
+const DECOR = [[orangeIcon, 4, 12, 44, -10], [blossom.bind(null,'#FFB3C7'), 88, 8, 34, 0], [ingot, 90, 40, 46, 8], [ingot, 3, 50, 38, -6], [blossom.bind(null,'#FFD6E2'), 6, 80, 30, 0], [orangeIcon, 91, 72, 38, 12]];
+$('#decor').innerHTML = DECOR.map(([fn, x, y, w, r], i) => fn().replace(/%W/g, w).replace('<svg ', `<svg style="left:${x}%;top:${y}%;--r:${r}deg;animation-delay:${i * .7}s;opacity:.9" `)).join('');
+(() => {
+  let s = ''; const r = rng(3);
+  [[10,36,40],[70,24,44],[150,30,36],[330,20,48],[400,34,40]].forEach(([x,y,w]) => {
+    s += `<rect x="${x}" y="${y}" width="${w}" height="${110 - y}" fill="#8E1017"/>`;
+    for (let yy = y + 8; yy < 96; yy += 9) for (let xx = x + 5; xx < x + w - 5; xx += 8) if (r() < .45) s += `<rect x="${xx}" y="${yy}" width="4" height="4" fill="#FFC83D" opacity="${f1(.35 + r() * .5)}"/>`;
+  });
+  for (let x = 0; x < 480; x += 40) s += `<rect x="${x}" y="70" width="40" height="40" fill="#A8141C"/><path d="M${x} 70 h40 l-4 -6 h-32z" fill="#7A0D13"/><path d="M${x + 8} 88 v-8 a4 4 0 0 1 8 0 v8z M${x + 24} 88 v-8 a4 4 0 0 1 8 0 v8z" fill="#FFC83D" opacity=".75"/><path d="M${x + 6} 110 v-10 a14 7 0 0 1 28 0 v10z" fill="#7A0D13"/>`;
+  $('#skyline').innerHTML = s;
+})();
+
+/* ----- "server" result (simulated for the prototype) ----- */
+function pickTier(){ const r = Math.random(); return r < 0.5 ? 'voucher' : r < 0.7 ? 'gift' : 'blessing'; }
+function makeCode(){ const a = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; let c = ''; for (let i = 0; i < 6; i++) c += a[Math.floor(Math.random() * a.length)]; return 'DEMO-' + K + '-' + c; }
+function prizeFor(tier){
+  const code = makeCode();
+  if (tier === 'voucher') return { tier, code, kind:'Dining voucher', title:'S$10 off lunch', venue:L.food, venueNote:L.name + '’s favourite', expiry:'20 Feb 2027',
+    steps:[`Show this QR at ${L.food} before you pay.`, 'Staff scan it once, then it’s used up.', 'One voucher per table.'],
+    terms:['Sample voucher for the prototype. Real values, dates and terms come from the live promotions feed.', 'Not exchangeable for cash.', 'Valid for dine-in only.'],
+    line: K === 'HH' ? `Huat ah! A voucher for ${L.food}, my favourite! Show the QR before you pay. Let’s go!` : `Look! A voucher for ${L.food}. Show the QR before you pay!` };
+  if (tier === 'gift') return { tier, code, kind:'Collectible gift', title:`${L.name} plush charm`, venue:'Prosperity Lions booth', venueNote:'Location TBC', expiry:'20 Feb 2027',
+    steps:['Visit the Prosperity Lions booth.', 'Show this QR to the crew.', 'Pick up your plush charm while stocks last.'],
+    terms:['Sample gift for the prototype. Real gifts and booth locations are confirmed by the resort team.', 'One gift per guest.', 'While stocks last.'],
+    line: K === 'HH' ? 'Whoa, a plush of ME! Charge over to the booth and grab it!' : `A little plush of me! Go pick it up at the booth!` };
+  const b = BLESSINGS[Math.floor(Math.random() * BLESSINGS.length)];
+  return { tier, blessing:b, line: K === 'HH' ? 'No voucher this time, but I found a blessing just for you. Plus 5 bonus Lucky Points! Let’s try again tomorrow!' : 'No voucher this time, but here’s a blessing just for you, plus 5 bonus Lucky Points!' };
+}
+
+/* ----- screens ----- */
+const starStr = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+function hero(line){
+  const ctx = fromGame
+    ? `<span class="pill">Lion Dance Party <b aria-label="${stars} of 3 stars">${starStr(stars)}</b></span><span class="pill">+<b>5</b> Lucky Points</span>`
+    : `<span class="pill">Daily hongbao</span><span class="pill">1 per day</span>`;
+  return `<div class="rhero"><div class="rays" aria-hidden="true"></div>
+    <div class="hero-row">${heroLion()}<div class="say"><span class="who"><span class="zh">${L.zh}</span>${L.name}</span><p>${line}</p></div></div>
+    <div class="context">${ctx}</div></div>`;
+}
+function show(html){ app.innerHTML = `<div class="screen">${html}</div>`; window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }
+
+function renderSealed(){
+  heroExpr = 'happy'; heroClip = null;
+  const line = fromGame
+    ? (stars >= 3 ? 'That drumming was AMAZING! I saved a hongbao for you. Open it!' : 'Great drumming! I saved a hongbao for you. Open it!')
+    : 'I saved a hongbao for you today. Open it!';
+  show(`${hero(line)}
+    <div class="seal-body">
+      <p class="eyebrow">Your lucky hongbao</p>
+      <h2>Tap to open</h2>
+      <button class="env" id="env" aria-label="Open your hongbao">
+        <span class="env-back"></span>
+        <span class="env-card"><span class="zh" aria-hidden="true">福</span></span>
+        <span class="env-front"></span>
+        <span class="env-trim"></span>
+        <span class="env-flap"></span>
+        <span class="env-seal"><span class="zh" aria-hidden="true">开</span></span>
+      </button>
+      <p class="small" style="margin:0;max-width:34ch">One hongbao a day. Every hongbao has something inside: a voucher, a gift or a lucky blessing.</p>
+    </div>`);
+  const env = $('#env');
+  env.onclick = () => {
+    if (env.classList.contains('open')) return;
+    env.classList.add('open');
+    const r = env.getBoundingClientRect();
+    setTimeout(() => burst(r.left + r.width / 2, r.top + 40, true), 380);
+    setTimeout(() => renderResult(prizeFor(pickTier())), reduce ? 200 : 1350);
+  };
+}
+
+function renderResult(p){
+  heroExpr = p.tier === 'blessing' ? 'happy' : 'celebrating';
+  heroClip = p.tier === 'blessing' ? 'blessing' : 'hongbao_win';
+  let body = '';
+  if (p.tier === 'blessing'){
+    body = `<div class="res-head"><p class="eyebrow">Inside your hongbao</p><h2>A lucky blessing!</h2></div>
+      <div class="blessing">
+        <span class="big" lang="zh">${p.blessing[0]}</span>
+        <span class="mean">${p.blessing[1]}</span>
+        <span class="pill bonus">+<b>5</b> bonus Lucky Points</span>
+      </div>
+      <p class="note">Come back tomorrow for another hongbao. Just for fun, blessings are always free.</p>`;
+  } else {
+    body = `<div class="res-head"><p class="eyebrow">Inside your hongbao</p><h2>${p.tier === 'voucher' ? 'Huat ah! A voucher!' : 'You got a gift!'}</h2></div>
+      <article class="ticket" aria-label="${p.kind}: ${p.title} at ${p.venue}">
+        <div class="t-top ${p.tier === 'gift' ? 'gift' : ''}">
+          <span class="stamp" aria-label="Sample">SAMPLE</span>
+          <span class="t-kind">${p.kind}</span>
+          <h3>${p.title}</h3>
+          <p class="t-venue">${p.venue}<small>${p.venueNote}</small></p>
+        </div>
+        <div class="perf" aria-hidden="true"></div>
+        <div class="t-body">
+          <div class="qr" id="qr" role="img" aria-label="QR code for ${p.code}"></div>
+          <div class="t-meta">
+            <div class="kv"><span class="k">Voucher code</span><span class="v code" id="code">${p.code}</span></div>
+            <div class="kv"><span class="k">Valid until</span><span class="v">${p.expiry}</span></div>
+            <button class="copy" id="copy" type="button">Copy code</button>
+          </div>
+        </div>
+        <ol class="steps">${p.steps.map(s => `<li>${s}</li>`).join('')}</ol>
+        <details class="terms"><summary>Terms</summary><ul>${p.terms.map(t => `<li>${t}</li>`).join('')}</ul></details>
+      </article>`;
+  }
+  show(`${hero(p.line)}
+    <div class="res-body">
+      ${body}
+      <div class="actions">
+        <a class="btn" href="${CHAT_URL}#chat${K}">Back to chat <span class="zh" aria-hidden="true">聊天</span></a>
+        <a class="btn soft" href="${GAME_URL}">Play the drum game again</a>
+      </div>
+      <p class="note">Prototype: vouchers and codes here are samples and can’t be redeemed.</p>
+    </div>`);
+  // the lion's reaction clip plays once, then the still portrait takes over
+  armClips($('#heroClip'), () => { const c = $('#heroClip'); heroClip = null; if (c) c.outerHTML = lionSVG(K); });
+  if (p.tier !== 'blessing'){ drawQR(p.code); $('#copy').onclick = () => copyCode(p.code); }
+  if (!reduce){ const r = app.getBoundingClientRect(); setTimeout(() => { burst(r.left + r.width * .25, r.top + 150, false); burst(r.left + r.width * .75, r.top + 130, false); }, 200); }
+  markDemo(p.tier);
+}
+
+function drawQR(code){
+  const box = $('#qr');
+  if (typeof QRCode === 'undefined'){ box.innerHTML = `<span class="nofallback">QR code couldn’t load. Use the code instead.</span>`; return; }
+  try {
+    new QRCode(box, { text: 'PROSPERITY-LIONS|SAMPLE|' + code, width: 272, height: 272, colorDark: '#4A1216', colorLight: '#ffffff', correctLevel: QRCode.CorrectLevel.M });
+  } catch (e){ box.innerHTML = `<span class="nofallback">QR code couldn’t load. Use the code instead.</span>`; }
+}
+function toast(msg){ const t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 1800); }
+function copyCode(code){
+  const done = () => toast('Code copied');
+  const fallback = () => { const el = $('#code'); const r = document.createRange(); r.selectNodeContents(el); const s = getSelection(); s.removeAllRanges(); s.addRange(r); toast('Code selected. Copy it from your menu.'); };
+  try { navigator.clipboard.writeText(code).then(done, fallback); } catch (e){ fallback(); }
+}
+function burst(x, y, coins){
+  if (reduce) return;
+  const box = document.createElement('div'); box.className = 'burst'; box.style.left = x + 'px'; box.style.top = y + 'px';
+  const cols = ['#FFC83D','#E3262B','#FF8FA3','#2FAE84','#FF9A1F','#fff'];
+  for (let k = 0; k < (coins ? 26 : 18); k++){
+    const a = Math.random() * Math.PI * 2, d = 50 + Math.random() * 90;
+    const i = document.createElement('i');
+    if (coins && k % 2) i.className = 'coin'; else i.style.background = cols[k % cols.length];
+    i.style.setProperty('--x', Math.cos(a) * d + 'px'); i.style.setProperty('--y', Math.sin(a) * d - 40 + 'px'); i.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+    box.appendChild(i);
+  }
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 1000);
+}
+function markDemo(tier){ document.querySelectorAll('#demoChips .chip').forEach(c => c.setAttribute('aria-pressed', String(c.dataset.tier === tier))); }
+document.querySelectorAll('#demoChips .chip').forEach(c => c.onclick = () => {
+  if (c.dataset.tier === 'reset'){ markDemo(''); renderSealed(); } else renderResult(prizeFor(c.dataset.tier));
+});
+
+renderSealed();
+})();
+</script>
+
+</body></html>
