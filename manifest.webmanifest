@@ -1,0 +1,14 @@
+{
+  "name": "Prosperity Lions",
+  "short_name": "Prosperity Lions",
+  "description": "Find your Prosperity Lion, drum in the Lion Dance Party and open your lucky hongbao.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E3262B",
+  "theme_color": "#E3262B",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
