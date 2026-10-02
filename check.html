@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Chat Check</title>
+<script src="config.js"></script>
+<style>
+  :root{--red:#E3262B;--red-deep:#A8141C;--gold:#FFC83D;--paper:#FFFBF3;--cream:#FFF1DC;--line:#F1D7B3;--ink:#4A1216;--muted:#8A5A4E;--ok:#1F8A66;--bad:#C81E24;--warn:#B8700A}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--red);color:var(--ink);font:16px/1.45 ui-rounded,system-ui,-apple-system,"Segoe UI",sans-serif}
+  main{max-width:640px;margin:0 auto;padding:20px 16px 40px}
+  .card{background:var(--paper);border:3px solid var(--gold);border-radius:24px;box-shadow:0 6px 0 var(--red-deep);padding:20px}
+  h1{margin:0 0 4px;font-size:26px;color:var(--red)}
+  p{margin:0 0 14px}
+  .muted{color:var(--muted);font-size:14px}
+  button{font:inherit;font-weight:800;border:3px solid #FFD66B;border-radius:999px;padding:10px 22px;background:var(--red);color:#fff;box-shadow:0 4px 0 var(--red-deep);cursor:pointer}
+  button.soft{background:var(--cream);color:var(--red);border-color:var(--line);box-shadow:0 4px 0 var(--line)}
+  button:disabled{opacity:.5;cursor:default}
+  .row{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
+  ol{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+  li{background:#fff;border:2px solid var(--line);border-radius:16px;padding:10px 14px}
+  li b{display:block}
+  li .st{font-weight:800}
+  .ok .st{color:var(--ok)} .bad .st{color:var(--bad)} .warn .st{color:var(--warn)} .run .st{color:var(--muted)}
+  pre{margin:8px 0 0;white-space:pre-wrap;word-break:break-word;font:12.5px/1.4 ui-monospace,Menlo,Consolas,monospace;background:var(--cream);border-radius:10px;padding:8px 10px;max-height:240px;overflow:auto}
+  .verdict{margin-top:16px;padding:12px 14px;border-radius:16px;font-weight:700;background:var(--cream);border:2px solid var(--gold)}
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <h1>Lion chat check</h1>
+    <p class="muted">Runs the same steps as the lion chat, from this browser, and shows where it breaks. It sends two tiny test messages to Claude.</p>
+    <div class="row">
+      <button id="go">Run check</button>
+      <button id="copy" class="soft" disabled>Copy results</button>
+    </div>
+    <ol id="out"></ol>
+    <div id="verdict" class="verdict" hidden></div>
+  </div>
+</main>
+<script>
+const out = document.getElementById('out'), verdict = document.getElementById('verdict');
+const log = [];
+function step(title){
+  const li = document.createElement('li'); li.className = 'run';
+  li.innerHTML = '<b></b><span class="st">Running…</span><pre hidden></pre>';
+  li.querySelector('b').textContent = title; out.appendChild(li);
+  return (cls, status, detail) => {
+    li.className = cls; li.querySelector('.st').textContent = status;
+    const pre = li.querySelector('pre'); if (detail){ pre.hidden = false; pre.textContent = detail; }
+    log.push(`[${cls.toUpperCase()}] ${title}: ${status}${detail ? '\n' + detail : ''}`);
+  };
+}
+async function readStream(res){
+  const reader = res.body.getReader(), dec = new TextDecoder(); let raw = '', text = '', events = 0, errEv = null;
+  for (;;){
+    const { done, value } = await reader.read(); if (done) break;
+    raw += dec.decode(value, { stream: true });
+  }
+  for (const line of raw.split('\n')){
+    const l = line.trim(); if (!l.startsWith('data:')) continue;
+    try { const ev = JSON.parse(l.slice(5)); events++;
+      if (ev.type === 'content_block_delta' && ev.delta && ev.delta.type === 'text_delta') text += ev.delta.text;
+      if (ev.type === 'error') errEv = ev.error;
+    } catch {}
+  }
+  return { raw, text, events, errEv };
+}
+async function chatTest(url, title, payload){
+  const done = step(title);
+  let res;
+  try {
+    res = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+  } catch (e){
+    done('bad', 'Blocked before reaching the Worker', String(e) + '\nUsually: the Worker refused this site (CORS), or a network/firewall/ad-blocker blocked workers.dev.');
+    return 'network';
+  }
+  const ct = res.headers.get('content-type') || '';
+  if (!res.ok){
+    let body = ''; try { body = await res.text(); } catch {}
+    done('bad', 'Worker answered HTTP ' + res.status, body.slice(0, 1500));
+    return 'http_' + res.status;
+  }
+  const r = await readStream(res);
+  if (r.errEv){ done('bad', 'Claude sent an error mid-reply', JSON.stringify(r.errEv)); return 'stream_error'; }
+  if (!r.text.trim()){ done('bad', 'Reply came back empty', 'content-type: ' + ct + '\n' + r.raw.slice(0, 1500)); return 'empty'; }
+  done('ok', 'Pass: Claude replied', '"' + r.text.trim().slice(0, 300) + '"');
+  return 'ok';
+}
+document.getElementById('go').onclick = async () => {
+  const go = document.getElementById('go'); go.disabled = true; out.innerHTML = ''; log.length = 0; verdict.hidden = true;
+  log.push('Page: ' + location.href, 'Origin: ' + location.origin, 'Browser: ' + navigator.userAgent, 'Time: ' + new Date().toISOString());
+  const url = (window.LION_CHAT_API || '').trim();
+  let s = step('1. Settings file (config.js)');
+  if (!url){ s('bad', 'No Worker address found', 'config.js did not load or LION_CHAT_API is empty.'); finish('The site has no Worker address. Check config.js on GitHub.'); return; }
+  s('ok', 'Found', url);
+
+  s = step('2. Can this browser reach the Worker?');
+  try { await fetch(url, { mode: 'no-cors', cache: 'no-store' }); s('ok', 'Reachable'); }
+  catch (e){ s('bad', 'Not reachable', String(e) + '\nA network, firewall, VPN or ad-blocker is blocking workers.dev.'); finish('This network or browser blocks the Worker. Try a phone on mobile data, or turn off ad-blockers/VPN.'); return; }
+
+  const a = await chatTest(url, '3. Short test message', { system: 'Reply with the single word OK.', messages: [{ role: 'user', content: 'Say OK' }] });
+  const longBrief = 'You are a friendly lion mascot for a Chinese New Year app. '.repeat(100);
+  const b = await chatTest(url, '4. Full-size test (like a real lion chat)', { system: longBrief, messages: [{ role: 'assistant', content: 'Hello! I am your Prosperity Lion.' }, { role: 'user', content: 'Hi! Tell me a fun CNY fact in one sentence.' }] });
+
+  if (a === 'ok' && b === 'ok') finish('Everything passes from this browser. If the chat still fails, reload the app in a private window (or remove and re-add the home-screen icon) so it picks up the latest files.');
+  else if (a === 'network' || b === 'network') finish('The Worker is refusing this site or the request is blocked. Copy the results and send them to Claude.');
+  else finish('Something failed. Copy the results and send them to Claude.');
+};
+function finish(msg){
+  verdict.hidden = false; verdict.textContent = msg; log.push('VERDICT: ' + msg);
+  document.getElementById('go').disabled = false; document.getElementById('copy').disabled = false;
+}
+document.getElementById('copy').onclick = async () => {
+  const t = log.join('\n\n');
+  try { await navigator.clipboard.writeText(t); document.getElementById('copy').textContent = 'Copied!'; }
+  catch { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove(); document.getElementById('copy').textContent = 'Copied!'; }
+  setTimeout(() => document.getElementById('copy').textContent = 'Copy results', 2000);
+};
+</script>
+</body>
+</html>
