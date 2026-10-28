@@ -101,6 +101,15 @@ document.getElementById('go').onclick = async () => {
   try { await fetch(url, { mode: 'no-cors', cache: 'no-store' }); s('ok', 'Reachable'); }
   catch (e){ s('bad', 'Not reachable', String(e) + '\nA network, firewall, VPN or ad-blocker is blocking workers.dev.'); finish('This network or browser blocks the Worker. Try a phone on mobile data, or turn off ad-blockers/VPN.'); return; }
 
+  s = step('2b. Does the Worker accept this site?');
+  try {
+    const r = await fetch(url, { cache: 'no-store' }); const j = await r.json();
+    const ok = j.calling_site_allowed === true;
+    s(ok ? 'ok' : 'bad', ok ? 'Yes' : 'No: the Worker does not accept this site', JSON.stringify(j, null, 2));
+  } catch (e){
+    s('warn', 'Could not ask: the Worker is still running older code', 'Paste the latest worker.js into Cloudflare and click Deploy.\n' + String(e));
+  }
+
   const a = await chatTest(url, '3. Short test message', { system: 'Reply with the single word OK.', messages: [{ role: 'user', content: 'Say OK' }] });
   const longBrief = 'You are a friendly lion mascot for a Chinese New Year app. '.repeat(100);
   const b = await chatTest(url, '4. Full-size test (like a real lion chat)', { system: longBrief, messages: [{ role: 'assistant', content: 'Hello! I am your Prosperity Lion.' }, { role: 'user', content: 'Hi! Tell me a fun CNY fact in one sentence.' }] });

@@ -7,7 +7,8 @@ A clickable prototype of the Prosperity Lions Chinese New Year guest experience.
 | Personality quiz + lion chat | `/` |
 | Lion Dance Party drum game | `/game/` |
 | Lucky Hongbao rewards | `/hongbao/` |
-| Chat proxy (not part of the website) | `worker/worker.js` |
+| Chat proxy (not part of the website) | `worker/worker.js` + `wrangler.jsonc` |
+| Chat troubleshooting page | `/check.html` |
 
 The pages link to each other with relative paths, so the whole flow works from one URL. Each page keeps its own `img/` and `clips/` folders, so don't move them.
 
@@ -36,44 +37,44 @@ A lion icon appears on the home screen, and the app opens full-screen with no br
 
 ## Part 2: Switch on the live chat
 
-The API key must **never** go into this repo, because everything here is public. It lives only in the Cloudflare Worker.
+The chat goes through a small Cloudflare Worker (`worker/worker.js`) that holds your Claude API key. Cloudflare builds it **straight from this repo**, using `wrangler.jsonc`. That file names the Worker, sets which site may use it, and pins it to **US East**. That matters because Cloudflare sometimes runs Workers for Singapore visitors in Hong Kong, and Claude refuses requests from Hong Kong.
+
+The API key must **never** go into this repo, because everything here is public. It is typed into Cloudflare only.
 
 ### A. Get an API key
-1. Go to **console.anthropic.com** and sign in or sign up.
-2. Add billing (credits or a card) in the Console's **Billing** settings.
-3. Set a monthly **spend limit** in the Console's **Limits** settings (for example USD 20 while you test).
-4. Go to **API Keys → Create Key**, name it `prosperity-lions`, and copy it. You only see it once.
+1. Go to **console.anthropic.com** and sign in.
+2. Check **Billing** has credit, and set a monthly **spend limit** (e.g. USD 20).
+3. **API Keys → Create Key**, name it `prosperity-lions`, and copy it. You only see it once.
 
-### B. Create the Worker
-1. Sign up free at **dash.cloudflare.com**.
-2. Go to **Workers & Pages → Create → Create Worker** (the "Hello World" starter), name it `prosperity-lions-chat`, and click **Deploy**.
-3. Click **Edit code**. Delete everything, paste in the whole of `worker/worker.js` from this repo, and click **Deploy**.
-4. Copy the Worker address shown, e.g. `https://prosperity-lions-chat.yourname.workers.dev`.
+### B. Create the Worker from this repo
+1. Go to **dash.cloudflare.com → Workers & Pages → Create**.
+2. Choose **Import a repository** (Continue with GitHub) and allow Cloudflare to see this repo.
+3. Pick **prosperity_lions**. On the setup screen:
+   - **Project name:** `lion-chat-api` (must match `name` in `wrangler.jsonc`)
+   - **Build command:** leave empty
+   - **Deploy command:** `npx wrangler deploy`
+   - **Root directory:** `/` (leave as is)
+4. Click **Deploy** and wait for the build to finish.
 
-### C. Add the settings
-In the Worker go to **Settings → Variables and Secrets → Add**:
+### C. Add the key
+1. Open the Worker **lion-chat-api → Settings → Variables and Secrets** (the runtime section, *not* under Build).
+2. **+ Add** → Type **Secret** → Name `ANTHROPIC_API_KEY` → paste the key → **Deploy**.
 
-| Type | Name | Value |
-|---|---|---|
-| **Secret** | `ANTHROPIC_API_KEY` | the key from step A |
-| Text | `ALLOWED_ORIGIN` | `https://<your-username>.github.io` (no slash at the end, no repo name) |
-| Text (optional) | `MAX_PER_HOUR` | messages per visitor per hour, default `30` |
-| Text (optional) | `MODEL` | defaults to `claude-haiku-4-5-20251001` |
+### D. Check it
+Open `https://lion-chat-api.<your-subdomain>.workers.dev/?test=1`:
+- `runs_in` should be a US code such as `IAD`, `EWR` or `ORD`, **not** `HKG`.
+- `claude_test` should say **PASS**. If not, `what_to_do` says why.
 
-Click **Deploy** / **Save** so the settings take effect.
+`config.js` must point to that address:
+```js
+window.LION_CHAT_API = 'https://lion-chat-api.<your-subdomain>.workers.dev';
+```
+Then open `check.html` on the site and tap **Run check**. Every step should pass.
 
-### D. Point the site at the Worker
-1. On GitHub, open `config.js` and click the pencil icon to edit.
-2. Paste the Worker address between the quotes:
-   ```js
-   window.LION_CHAT_API = 'https://prosperity-lions-chat.yourname.workers.dev';
-   ```
-3. Commit. After about a minute, reload the site and chat with your lion.
-
-### If the chat doesn't answer
-- **"Oops, the drums were too loud…"**: open the Worker in Cloudflare and check **Logs**. `origin_not_allowed` means `ALLOWED_ORIGIN` doesn't exactly match your site's address. `missing_api_key` means the secret wasn't saved. An upstream error usually means a wrong key or no billing credit.
-- **"All out of breath"**: the visitor hit the hourly limit, or the Claude API is busy.
-- **Still says chat is switched off**: `config.js` is empty, or GitHub Pages hasn't updated yet.
+### Day-to-day
+- **Key expired or replaced:** update only the `ANTHROPIC_API_KEY` secret in Cloudflare (step C). Nothing on GitHub changes.
+- **Changing the Worker or the allowed site:** edit `worker/worker.js` or `wrangler.jsonc` on GitHub. Cloudflare rebuilds automatically.
+- **Chat says "drums were too loud":** run `check.html`. The failing step shows the reason.
 
 ---
 

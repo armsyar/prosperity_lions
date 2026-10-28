@@ -1,0 +1,22 @@
+// Cloudflare Worker settings for the lion chat.
+// Cloudflare reads this file when it builds the Worker from this GitHub repo.
+// Your API key does NOT go here: this repo is public. Add it in Cloudflare
+// under the Worker → Settings → Variables and Secrets, as a Secret.
+{
+  "name": "lion-chat-api",
+  "main": "worker/worker.js",
+  "compatibility_date": "2025-09-01",
+  "workers_dev": true,
+
+  // Run the Worker near US East (Anthropic's side), never in Hong Kong,
+  // where Claude refuses requests.
+  "placement": { "region": "aws:us-east-1" },
+
+  "vars": {
+    // The website allowed to use the chat. Several: separate with commas.
+    "ALLOWED_ORIGIN": "https://armsyar.github.io",
+    "MAX_PER_HOUR": "30"
+  },
+
+  "observability": { "enabled": true }
+}
