@@ -197,7 +197,7 @@
   <div class="hud-bar">
     <div class="hud-pill hud-score"><span class="lbl">Score</span><span id="score">0</span></div>
     <div class="hud-meter"><span class="lbl"><span id="meterLbl">Prosperity</span><span id="mult"></span></span><div class="meter" id="meter"><i id="meterFill"></i></div></div>
-    <div class="hud-pill hud-time" id="timeBox"><span class="lbl">Time</span><span id="time">1:00</span></div>
+    <div class="hud-pill hud-time" id="timeBox"><span class="lbl">Time</span><span id="time">0:45</span></div>
     <button id="pauseBtn" class="iconbtn" aria-label="Pause"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="2" width="3.6" height="12" rx="1"/><rect x="9.4" y="2" width="3.6" height="12" rx="1"/></svg></button>
   </div>
   <button id="powerBtn" disabled aria-label="Fiery Charge power, charging"><span class="core"><span class="pz">火</span><span class="pe">Charge</span></span></button>
@@ -212,7 +212,7 @@
     </div>
     <div class="pbody">
       <p class="lede">You’re the drummer! Hit the drum on the beat and Hong Hong dances through Resorts World Sentosa, from WEAVE to Adventure Cove: stepping on every beat, leaping onto plum-blossom poles and standing tall to pluck the lucky greens. Fill the Prosperity meter and tap 火 to turn Hong Hong golden.</p>
-      <div class="facts"><span class="pill">60-second round</span><span class="pill">3 moves</span><span class="pill">Win a hongbao</span></div>
+      <div class="facts"><span class="pill">45-second round</span><span class="pill">3 moves</span><span class="pill">Win a hongbao</span></div>
       <ul class="howto">
         <li><span class="n n-tap" aria-hidden="true"></span><div><b>Tap</b><span>Drum beat: lion steps and shakes its head</span></div></li>
         <li><span class="n n-leap" aria-hidden="true">↑</span><div><b>Swipe up</b><span>Leap, land and stand tall</span></div></li>
@@ -334,17 +334,17 @@ function armClips(root, onDone){
 
 /* ================= settings ================= */
 const DIFF = {
-  kids: { label: 'Kids', perfect: 0.09, good: 0.17, approach: 2.0 },
-  easy: { label: 'Easy', perfect: 0.06, good: 0.125, approach: 1.6 },
-  hard: { label: 'Hard', perfect: 0.045, good: 0.095, approach: 1.25 }
+  kids: { label: 'Kids', perfect: 0.09, good: 0.17, approach: 2.6 },
+  easy: { label: 'Easy', perfect: 0.06, good: 0.125, approach: 2.2 },
+  hard: { label: 'Hard', perfect: 0.045, good: 0.095, approach: 1.8 }
 };
 let difficulty = store.get('diff', 'easy'); if (!DIFF[difficulty]) difficulty = 'easy';
 let soundOn = store.get('sound', true);
 let calibMs = store.get('calib', 0);
-let bests = store.get('best', {});
+let bests = store.get('best45', {});   // 45-second rounds keep their own best scores
 
 /* ================= song ================= */
-const BPM = 120, SLOT = 60 / BPM / 2; // eighth-note slots, 0.25s
+const BPM = 96, SLOT = 60 / BPM / 2; // eighth-note slots, 0.3125s; one bar = 2.5s
 const SECS = {
   intro: null,
   wake: { en: 'The Lion Wakes', zh: '醒狮', loc: 'at WEAVE' },
@@ -352,35 +352,30 @@ const SECS = {
   poles: { en: 'Pole Leaps', zh: '跳桩', loc: 'at Universal Studios Singapore' },
   roar: { en: 'The Roar', zh: '狮吼', loc: 'at The Laurus and Soi Social' },
   greens: { en: 'Pluck the Greens', zh: '采青', loc: 'at the Singapore Oceanarium' },
-  finale: { en: 'Grand Finale', zh: '高潮', loc: 'at Equarius and Adventure Cove' }
+  finale: { en: 'Grand Finale', zh: '高潮', loc: 'at Equarius and Adventure Cove' },
+  outro: null
 };
+// One character per eighth note: x = drum on every level, e = Easy and Hard only, h = Hard only,
+// L = leap (swipe up), H = hold with - for each eighth it lasts, . = rest
 const B = (s, ...ps) => ps.map(p => ({ s, p }));
 const BARS = [
-  ...B('intro', '........', '........'),
-  ...B('wake', 'x...x...', 'x.x.x...', 'x.x.x.x.', 'x.x.x.x.'),
-  ...B('walk', 'x.x.x.x.', 'x.xxx...', 'H---....', 'x.x.x.x.', 'H---x.x.'),
-  ...B('poles', 'L...x.x.', 'L...x.x.', 'x.x.L...', 'L...L...', 'x.xxL...', 'L.x.L...'),
-  ...B('roar', 'xx.xx.x.', 'x.x.xxx.', 'x.x.L...', 'xx.xx.x.', 'x.xxL...'),
-  ...B('greens', 'H-------', 'x.x.x.x.', 'H---H---', 'x.x.L...'),
-  ...B('finale', 'x.x.xxx.', 'L.x.L.x.', 'xxx.xxx.', 'L...H---', 'xxxxL...')
+  ...B('intro', '........', '........'),                        // 5 s: get ready, 3-2-1
+  ...B('wake', 'x...x...', 'x.x.x.e.'),                         // 5 s at WEAVE
+  ...B('walk', 'x.x.x.eh', 'H---x.x.', 'x.e.xhx.'),             // 7.5 s past the hotels
+  ...B('poles', 'L...x.e.', 'x.x.L...', 'L...x.xh', 'L...L...'), // 10 s on the plum-blossom poles at USS
+  ...B('roar', 'x.xhx.e.', 'xe..x.xh', 'x.e.L...'),             // 7.5 s at The Laurus and Soi Social
+  ...B('greens', 'H-------', 'x.e.H---'),                       // 5 s at the Oceanarium
+  ...B('finale', 'x.xhx.e.', 'L.x.L.e.', 'xhe.xhe.'),           // 7.5 s at Equarius and Adventure Cove
+  ...B('outro', 'L.......')                                     // last leap lands on the closing gong
 ];
 const SONG_SLOTS = BARS.length * 8;
 const SONG_END = SONG_SLOTS * SLOT;
 const PLAY_START = 2 * 8 * SLOT;          // first note, right after the 3-2-1 countdown
-const ROUND_SECS = 60;                    // every round lasts exactly 60 seconds
-const ROUND_END = PLAY_START + ROUND_SECS;
+const ROUND_SECS = 45;                    // every round lasts exactly 45 seconds
+const ROUND_END = PLAY_START + ROUND_SECS; // = SONG_END: the gong rings for the last 2.5 seconds
 
 function patternFor(bar, diff) {
-  const p = bar.p.split('');
-  if (diff === 'kids') {
-    for (let i = 1; i < 8; i += 2) if (p[i] === 'x') p[i] = '.';
-  } else if (diff === 'hard' && ['walk', 'roar', 'finale', 'wake'].includes(bar.s) && bar !== BARS[2]) {
-    for (let i = 1; i < 8; i += 2) {
-      const next = p[i + 1] || '.';
-      if (p[i] === '.' && p[i - 1] === 'x' && next !== 'L' && next !== 'H') p[i] = 'x';
-    }
-  }
-  return p;
+  return bar.p.split('').map(c => c === 'e' ? (diff === 'kids' ? '.' : 'x') : c === 'h' ? (diff === 'hard' ? 'x' : '.') : c);
 }
 function buildChart(diff) {
   const notes = [];
@@ -480,11 +475,9 @@ function sfxChime(t, v = 0.22) {
 }
 function playBacking(k, when) {
   const bar = Math.floor(k / 8), i = k % 8;
-  if (bar >= BARS.length) {
-    if (k === SONG_SLOTS) { sfxGong(when, 0.55); sfxCymbal(when, 0.35, true); sfxDrum(when, 1, true); }
-    return;
-  }
+  if (bar >= BARS.length) return;
   const s = BARS[bar].s;
+  if (s === 'outro') { if (i === 0) { sfxGong(when, 0.55); sfxCymbal(when, 0.35, true); sfxDrum(when, 1, true); } return; }
   if (s === 'intro') {
     if (bar === 0) { if (i === 0) sfxGong(when, 0.4); if (i === 4) sfxGong(when, 0.25, true); if (i % 2 === 0) sfxCymbal(when, 0.08); }
     else { if (i === 0 || i === 2 || i === 4) sfxTok(when, 0.35, false); if (i === 6) { sfxTok(when, 0.4, true); sfxCymbal(when, 0.22, true); } }
@@ -640,7 +633,7 @@ function finish() {
   const stars = acc >= 0.88 ? 3 : acc >= 0.62 ? 2 : 1;
   lastStars = stars;
   const prev = bests[difficulty] || 0;
-  if (score > prev) { bests[difficulty] = score; store.set('best', bests); }
+  if (score > prev) { bests[difficulty] = score; store.set('best45', bests); }
   $('#resDiff').textContent = DIFF[difficulty].label + ' · Lion Dance Party';
   $('#resTitle').textContent = ['', 'Good start!', 'Great drumming!', 'Magnificent!'][stars];
   $('#resScore').textContent = score.toLocaleString('en-US');
@@ -739,7 +732,7 @@ function judge(n, t, src) {
   const grade = ad <= w.perfect ? 'perfect' : 'good';
   counts[grade]++; combo++; maxCombo = Math.max(maxCombo, combo); comboPulse = 1;
   addScore((grade === 'perfect' ? 300 : 120) + (n.type === 'leap' ? 60 : 0));
-  meter = Math.min(100, meter + (grade === 'perfect' ? 4 : 2.5) * (n.type === 'leap' ? 1.8 : 1));
+  meter = Math.min(100, meter + (grade === 'perfect' ? 4.5 : 3) * (n.type === 'leap' ? 1.8 : 1));
   n.state = n.type === 'hold' ? 1 : 2;
   pop(grade, grade === 'good' ? (dt < 0 ? 'early' : 'late') : '');
   vibrate(grade === 'perfect' ? 14 : 8);
@@ -1020,11 +1013,11 @@ function beatPulse() { const f = bpNow - Math.floor(bpNow); return Math.pow(1 - 
 
 // The panorama runs WEAVE → hotels → Universal Studios Singapore → The Laurus & Soi Social → Oceanarium → Equarius & Adventure Cove
 const RWS = { weave: 230, hotels: 625, uss: 990, laurus: 1370, ocean: 1750, cove: 2140, width: 2330 };
-const SEC_SPOT = { intro: 'weave', wake: 'weave', walk: 'hotels', poles: 'uss', roar: 'laurus', greens: 'ocean', finale: 'cove' };
+const SEC_SPOT = { intro: 'weave', wake: 'weave', walk: 'hotels', poles: 'uss', roar: 'laurus', greens: 'ocean', finale: 'cove', outro: 'cove' };
 let camX = RWS.weave;
 function cameraTarget() {
   if (state === 'play' || state === 'paused') {
-    const bar = Math.floor(Math.max(0, songTime()) / (SLOT * 8));
+    const bar = Math.floor(Math.max(0, songTime() + 1) / (SLOT * 8));   // look 1 s ahead so each place is in view as its banner appears
     const s = BARS[Math.min(bar, BARS.length - 1)].s;
     return RWS[SEC_SPOT[s]];
   }
@@ -1033,7 +1026,7 @@ function cameraTarget() {
 }
 function updateCamera(dt) {
   const t = cameraTarget();
-  camX += (t - camX) * Math.min(1, dt * (state === 'play' ? 0.9 : 0.6));
+  camX += (t - camX) * Math.min(1, dt * (state === 'play' ? 1.3 : 0.6));
 }
 
 function renderStage() {
@@ -1443,17 +1436,17 @@ function drawStageText() {
     }
   }
   // countdown
-  if (t < 4.1) {
+  const BAR = SLOT * 8, BEAT = SLOT * 2;
+  if (t < PLAY_START + 0.1) {
     const cy = clamp(G.horizon * 0.5, safeT + 170, G.horizon);
-    let txt = null, sub = '';
-    if (t < 2) { txt = 'Get ready'; sub = 'Hit the drum when a note reaches it'; }
-    else if (t < 2.5) txt = '3'; else if (t < 3) txt = '2'; else if (t < 3.5) txt = '1'; else txt = '起!';
-    const local = t < 2 ? 0.2 : ((t - 2) % 0.5) / 0.5;
+    let txt = null, sub = '', local = 0.2;
+    if (t < BAR) { txt = 'Get ready'; sub = 'Hit the drum when a note reaches it'; }
+    else { const k = Math.min(3, Math.floor((t - BAR) / BEAT)); txt = ['3', '2', '1', '起!'][k]; local = clamp((t - BAR - k * BEAT) / BEAT, 0, 1); }
     g.save(); g.translate(W / 2, cy);
-    const sc = t < 2 ? 1 : 1.25 - local * 0.25; g.scale(sc, sc);
-    g.globalAlpha = t < 2 ? clamp((t + 0.4) * 2, 0, 1) : 1 - local * 0.5;
+    const sc = t < BAR ? 1 : 1.25 - local * 0.25; g.scale(sc, sc);
+    g.globalAlpha = t < BAR ? clamp((t + 0.4) * 2, 0, 1) : 1 - local * 0.5;
     if (txt === '起!') outlinedText(txt, 0, 0, `86px ${FONT_BRUSH}`, '#FFE7A3', '#A8141C', 10);
-    else if (t < 2) { outlinedText(txt, 0, 0, `40px ${FONT_DISPLAY}`, '#FFFBF3', '#6B0F14', 7); outlinedText(sub, 0, 30, `700 15px "Baloo 2", sans-serif`, '#FFE7A3', '#6B0F14', 4); }
+    else if (t < BAR) { outlinedText(txt, 0, 0, `40px ${FONT_DISPLAY}`, '#FFFBF3', '#6B0F14', 7); outlinedText(sub, 0, 30, `700 15px "Baloo 2", sans-serif`, '#FFE7A3', '#6B0F14', 4); }
     else outlinedText(txt, 0, 0, `86px ${FONT_DISPLAY}`, '#FFFBF3', '#A8141C', 10);
     g.restore();
   }
